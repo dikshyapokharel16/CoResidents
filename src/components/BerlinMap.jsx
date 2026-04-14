@@ -63,21 +63,21 @@ const BERLIN_KIEZE = [
   'Zehlendorf',
 ].sort()
 
-// ── Neon district palette ──────────────────────────────────────────
-const DISTRICT_PALETTE = [
-  { fill: '#ff2d78', border: '#ff6699' }, // hot pink
-  { fill: '#a855f7', border: '#cc88ff' }, // electric purple
-  { fill: '#00d4ff', border: '#66e8ff' }, // electric cyan
-  { fill: '#ff7c00', border: '#ffaa55' }, // neon orange
-  { fill: '#22dd66', border: '#55ff99' }, // electric green
-  { fill: '#4466ff', border: '#88aaff' }, // electric blue
-  { fill: '#ff00aa', border: '#ff66cc' }, // magenta
-  { fill: '#dddd00', border: '#ffff44' }, // neon yellow
-  { fill: '#00ddcc', border: '#44ffee' }, // aqua
-  { fill: '#ff5500', border: '#ff8844' }, // neon red
-  { fill: '#88ff00', border: '#bbff44' }, // lime
-  { fill: '#cc44ff', border: '#ee88ff' }, // violet
-]
+// ── Vibrant random palette — new colours on every page load ──────
+function makeVibrantPalette(n) {
+  // Spread hues evenly around the wheel then jitter each one slightly
+  const baseStep = 360 / n
+  return Array.from({ length: n }, (_, i) => {
+    const hue  = Math.round((i * baseStep + Math.random() * baseStep * 0.6) % 360)
+    const sat  = 88 + Math.round(Math.random() * 12)   // 88–100 % — fully saturated
+    const fill = Math.round(48 + Math.random() * 14)    // 48–62 % lightness
+    const bord = Math.min(fill + 16, 82)                // border slightly lighter
+    return {
+      fill:   `hsl(${hue},${sat}%,${fill}%)`,
+      border: `hsl(${hue},${sat}%,${bord}%)`,
+    }
+  })
+}
 
 // ── Map layer specs ────────────────────────────────────────────────
 const districtFill = {
@@ -275,8 +275,9 @@ export default function BerlinMap() {
     fetch(BERLIN_GEOJSON)
       .then(r => r.json())
       .then(data => {
+        const palette  = makeVibrantPalette(data.features.length)
         const coloured = data.features.map((f, i) => {
-          const p = DISTRICT_PALETTE[i % DISTRICT_PALETTE.length]
+          const p = palette[i]
           return {
             ...f,
             properties: { ...f.properties, fillColor: p.fill, borderColor: p.border },
@@ -318,7 +319,7 @@ export default function BerlinMap() {
     if (map) {
       map.easeTo({
         center: [resident.lng, resident.lat],
-        zoom: 15.5,
+        zoom: 17,
         pitch: 62,
         bearing: -28,
         duration: 2600,
@@ -364,7 +365,7 @@ export default function BerlinMap() {
     setUserPin({ lng, lat, label: 'Dropped pin' })
     setClickToPlace(false)
     setIs3D(true)
-    mapRef.current?.getMap()?.easeTo({ center: [lng, lat], zoom: 15, pitch: 52, bearing: -18, duration: 1200 })
+    mapRef.current?.getMap()?.easeTo({ center: [lng, lat], zoom: 17, pitch: 52, bearing: -18, duration: 1200 })
   }, [clickToPlace])
 
   // ── Fly to a kiez by name (shared by form submit + suggestion click)
@@ -405,7 +406,7 @@ export default function BerlinMap() {
       setIs3D(true)
       map.easeTo({
         center: [target.lng, target.lat],
-        zoom: 15,
+        zoom: 17,
         pitch: 52,
         bearing: -18,
         duration: 2000,
