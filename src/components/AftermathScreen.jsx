@@ -147,11 +147,11 @@ export default function AftermathScreen({ resident, type, Icon, helperCount, kie
 const s = {
   card: {
     width: '100%', maxWidth: 480,
-    background: 'rgba(30,22,16,0.97)',
-    border: '1px solid rgba(212,104,42,0.14)',
+    background: 'rgba(4,6,15,0.97)',
+    border: '1px solid rgba(0,245,255,0.12)',
     borderRadius: 16,
     padding: '32px 32px 28px',
-    boxShadow: '0 24px 80px rgba(0,0,0,0.7), 0 0 0 1px rgba(212,104,42,0.06)',
+    boxShadow: '0 24px 80px rgba(0,0,0,0.8), 0 0 0 1px rgba(0,245,255,0.05)',
     display: 'flex', flexDirection: 'column', gap: 0,
     position: 'relative',
     maxHeight: '90vh', overflowY: 'auto',
@@ -159,7 +159,7 @@ const s = {
   closeBtn: {
     position: 'absolute', top: 16, right: 16,
     background: 'none', border: 'none',
-    color: 'rgba(237,228,216,0.3)', fontSize: 14,
+    color: 'rgba(224,240,255,0.3)', fontSize: 14,
     cursor: 'pointer', padding: '4px 6px', lineHeight: 1,
     fontFamily: 'Inter',
   },
@@ -180,7 +180,7 @@ const s = {
   },
   skeleton: {
     position: 'absolute', inset: 0,
-    background: 'linear-gradient(135deg, rgba(212,104,42,0.08) 0%, rgba(138,184,178,0.06) 100%)',
+    background: 'linear-gradient(135deg, rgba(0,245,255,0.06) 0%, rgba(157,0,255,0.05) 100%)',
     display: 'flex', alignItems: 'center', justifyContent: 'center',
   },
   skeletonLabel: {
@@ -200,7 +200,7 @@ const s = {
   narrative: {
     fontFamily: "'Playfair Display', serif",
     fontSize: 16, lineHeight: 1.88,
-    color: 'rgba(237,228,216,0.82)',
+    color: 'rgba(224,240,255,0.82)',
     fontStyle: 'italic', fontWeight: 400,
     margin: '0 0 32px',
   },
@@ -216,13 +216,13 @@ const s = {
   statNum: {
     fontFamily: "'Playfair Display', serif",
     fontSize: 26, fontWeight: 700,
-    color: 'rgba(237,228,216,0.88)',
+    color: 'rgba(224,240,255,0.9)',
     lineHeight: 1, marginBottom: 6,
   },
   statLabel: {
     fontFamily: 'Inter', fontSize: 9, fontWeight: 500,
     letterSpacing: '0.1em', textTransform: 'uppercase',
-    color: 'rgba(212,190,168,0.35)', marginTop: 4,
+    color: 'rgba(224,240,255,0.28)', marginTop: 4,
   },
   backBtn: {
     width: '100%', padding: '16px 0',

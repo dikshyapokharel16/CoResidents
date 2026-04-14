@@ -1,10 +1,10 @@
 export const RESIDENT_TYPES = {
-  fox:   { emoji: '🦊', color: '#d4682a', label: 'Urban Fox',       populationStatus: 'Recovering' },
-  bee:   { emoji: '🐝', color: '#e8a84a', label: 'Solitary Bee',    populationStatus: 'At Risk'    },
-  bird:  { emoji: '🐦', color: '#8ab8b2', label: 'Migratory Bird',  populationStatus: 'At Risk'    },
-  tree:  { emoji: '🌳', color: '#96b87e', label: 'Linden Tree',     populationStatus: 'Stable'     },
-  boar:  { emoji: '🐗', color: '#b07848', label: 'Wild Boar',       populationStatus: 'Stable'     },
-  spree: { emoji: '🌊', color: '#7aacb0', label: 'Spree River',     populationStatus: 'At Risk'    },
+  fox:   { emoji: '🦊', color: '#ff6600', label: 'Urban Fox',       populationStatus: 'Recovering' },
+  bee:   { emoji: '🐝', color: '#ffee00', label: 'Solitary Bee',    populationStatus: 'At Risk'    },
+  bird:  { emoji: '🐦', color: '#00f5ff', label: 'Migratory Bird',  populationStatus: 'At Risk'    },
+  tree:  { emoji: '🌳', color: '#00ff88', label: 'Linden Tree',     populationStatus: 'Stable'     },
+  boar:  { emoji: '🐗', color: '#ff00cc', label: 'Wild Boar',       populationStatus: 'Stable'     },
+  spree: { emoji: '🌊', color: '#9d00ff', label: 'Spree River',     populationStatus: 'At Risk'    },
 }
 
 export const RESIDENTS = [
