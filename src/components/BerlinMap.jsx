@@ -41,6 +41,28 @@ const KIEZ_COORDS = {
   'marzahn':         { lng: 13.567, lat: 52.540, zoom: 13.0 },
 }
 
+// All Berlin Kieze / neighbourhoods — used for autocomplete
+const BERLIN_KIEZE = [
+  'Adlershof', 'Alt-Hohenschönhausen', 'Alt-Treptow', 'Altglienicke',
+  'Baumschulenweg', 'Biesdorf', 'Blankenburg', 'Bohnsdorf', 'Britz', 'Buch', 'Buckow',
+  'Charlottenburg', 'Charlottenburg-Nord',
+  'Dahlem', 'Französisch Buchholz', 'Friedenau', 'Friedrichsfelde',
+  'Friedrichshagen', 'Friedrichshain',
+  'Gatow', 'Gesundbrunnen', 'Gropiusstadt', 'Grunewald',
+  'Hakenfelde', 'Halensee', 'Haselhorst', 'Heinersdorf', 'Hellersdorf', 'Hermsdorf',
+  'Johannisthal', 'Karlshorst', 'Karow', 'Kaulsdorf', 'Kladow', 'Köpenick', 'Kreuzberg',
+  'Lankwitz', 'Lichtenberg', 'Lichterfelde',
+  'Mahlsdorf', 'Malchow', 'Mariendorf', 'Marienfelde', 'Märkisches Viertel',
+  'Marzahn', 'Mitte', 'Moabit', 'Müggelheim',
+  'Neukölln', 'Niederschöneweide', 'Niederschönhausen',
+  'Oberschöneweide', 'Pankow', 'Plänterwald', 'Prenzlauer Berg',
+  'Rahnsdorf', 'Reinickendorf', 'Rosenthal', 'Rudow', 'Rummelsburg',
+  'Schöneberg', 'Siemensstadt', 'Spandau', 'Staaken', 'Steglitz',
+  'Tegel', 'Tempelhof', 'Tiergarten', 'Treptow',
+  'Wannsee', 'Wedding', 'Weißensee', 'Wilhelmstadt', 'Wilmersdorf', 'Wittenau',
+  'Zehlendorf',
+].sort()
+
 // ── Neon district palette ──────────────────────────────────────────
 const DISTRICT_PALETTE = [
   { fill: '#ff2d78', border: '#ff6699' }, // hot pink
@@ -78,20 +100,21 @@ const districtLine = {
 }
 const districtLabel = {
   id: 'districts-label', type: 'symbol',
-  minzoom: 8.5, maxzoom: 15,
+  minzoom: 8.5, maxzoom: 16,
   layout: {
     'text-field': ['coalesce', ['get','Gemeinde_n'], ['get','name'], ['get','Name'], ''],
     'text-font': ['Open Sans Bold'],
-    'text-size': ['interpolate', ['linear'], ['zoom'], 8, 10, 11, 15, 13, 18],
-    'text-letter-spacing': 0.2,
+    'text-size': ['interpolate', ['linear'], ['zoom'], 8, 14, 10, 22, 12, 30, 14, 36],
+    'text-letter-spacing': 0.24,
     'text-transform': 'uppercase',
     'text-max-width': 10,
     'text-anchor': 'center',
   },
   paint: {
     'text-color': ['get', 'borderColor'],
-    'text-halo-color': 'rgba(2,3,12,0.96)',
-    'text-halo-width': 2.5,
+    'text-halo-color': 'rgba(2,3,12,0.98)',
+    'text-halo-width': 4,
+    'text-halo-blur': 1,
   },
 }
 // OSM building heights: prefer render_height (derived from building:levels in OSM)
@@ -165,6 +188,7 @@ export default function BerlinMap() {
   const [submittedKiez, setSubmittedKiez] = useState('')
   const [locationSet, setLocationSet]   = useState(false)
   const [highlightKiez, setHighlightKiez] = useState(null)
+  const [suggestions, setSuggestions]     = useState([])
 
   const [popup, setPopup]           = useState(null)
   const [popupShown, setPopupShown] = useState(false)
@@ -256,18 +280,14 @@ export default function BerlinMap() {
     setSubmittedKiez('')
   }, [])
 
-  // ── Location submit ────────────────────────────────────────────
-  const handleSubmit = (e) => {
-    e.preventDefault()
-    const val = inputVal.trim()
-    if (!val) return
-
+  // ── Fly to a kiez by name (shared by form submit + suggestion click)
+  const flyToKiez = useCallback((val) => {
+    setSuggestions([])
     setSubmittedKiez(val)
     setLocationSet(true)
     setHighlightKiez(val)
     clearTimeout(autoTimerRef.current)
 
-    // Find residents in this kiez → compute centroid for fly-to
     const valLower = val.toLowerCase()
     const hits = RESIDENTS.filter(r =>
       r.kiez.toLowerCase().includes(valLower) ||
@@ -282,35 +302,39 @@ export default function BerlinMap() {
         target = {
           lng: hits.reduce((s, r) => s + r.lng, 0) / hits.length,
           lat: hits.reduce((s, r) => s + r.lat, 0) / hits.length,
-          zoom: 13.5,
         }
       } else {
-        // Fall back to hardcoded neighbourhood lookup
         const entry = Object.entries(KIEZ_COORDS).find(([k]) =>
           k.includes(valLower) || valLower.includes(k)
         )
-        if (entry) target = { lng: entry[1].lng, lat: entry[1].lat, zoom: entry[1].zoom }
+        if (entry) target = { lng: entry[1].lng, lat: entry[1].lat }
       }
 
       if (target) {
         setIs3D(true)
         map.easeTo({
           center: [target.lng, target.lat],
-          zoom: target.zoom,
-          pitch: 45,
-          bearing: -15,
-          duration: 2000,
+          zoom: 15,          // street-level zoom
+          pitch: 52,
+          bearing: -18,
+          duration: 2200,
         })
       }
     }
 
-    // Show a dispatch from this kiez after the fly completes
     setTimeout(() => {
       if (!popupShown) {
         setPopup(pickResident(val))
         setPopupShown(true)
       }
-    }, 2200)
+    }, 2400)
+  }, [popupShown])
+
+  // ── Location submit ────────────────────────────────────────────
+  const handleSubmit = (e) => {
+    e.preventDefault()
+    const val = inputVal.trim()
+    if (val) flyToKiez(val)
   }
 
   const legend = Object.entries(RESIDENT_TYPES).map(([key, val]) => ({
@@ -344,26 +368,26 @@ export default function BerlinMap() {
           </Source>
         )}
 
-        {/* ── Kiez highlight ─────────────────────────────────── */}
+        {/* ── Kiez highlight — amber/gold so it stands apart from all district colours ── */}
         {highlightData && (
           <Source id="kiez-highlight" type="geojson" data={highlightData}>
-            {/* soft fill */}
+            {/* warm fill */}
             <Layer
               id="kiez-highlight-fill"
               type="fill"
-              paint={{ 'fill-color': '#00f5ff', 'fill-opacity': 0.1 }}
+              paint={{ 'fill-color': '#ffcc00', 'fill-opacity': 0.14 }}
             />
-            {/* outer glow */}
+            {/* wide outer glow */}
             <Layer
               id="kiez-highlight-glow"
               type="line"
-              paint={{ 'line-color': '#00f5ff', 'line-width': 12, 'line-blur': 20, 'line-opacity': 0.45 }}
+              paint={{ 'line-color': '#ffcc00', 'line-width': 16, 'line-blur': 28, 'line-opacity': 0.55 }}
             />
-            {/* crisp border */}
+            {/* crisp inner border */}
             <Layer
               id="kiez-highlight-border"
               type="line"
-              paint={{ 'line-color': '#00f5ff', 'line-width': 2, 'line-opacity': 0.9 }}
+              paint={{ 'line-color': '#ffee66', 'line-width': 2.5, 'line-opacity': 1 }}
             />
           </Source>
         )}
@@ -509,36 +533,83 @@ export default function BerlinMap() {
           </div>
         </div>
 
-        {/* Location search */}
-        <form onSubmit={handleSubmit} style={{ display: 'flex' }}>
-          <input
-            value={inputVal}
-            onChange={e => setInputVal(e.target.value)}
-            placeholder="Enter your Kiez…"
-            style={{
-              background: 'rgba(2,3,12,0.92)',
-              border: '1px solid rgba(0,245,255,0.22)',
-              borderRight: 'none',
-              borderRadius: '8px 0 0 8px',
-              padding: '9px 14px',
-              color: 'rgba(210,235,255,0.88)',
-              fontFamily: 'Inter', fontSize: 12,
-              outline: 'none', width: 185,
-              backdropFilter: 'blur(12px)',
-              letterSpacing: '0.03em',
-            }}
-            onFocus={e => { e.target.style.borderColor = 'rgba(0,245,255,0.6)'; e.target.style.boxShadow = '0 0 16px rgba(0,245,255,0.15)' }}
-            onBlur={e =>  { e.target.style.borderColor = 'rgba(0,245,255,0.22)'; e.target.style.boxShadow = 'none' }}
-          />
+        {/* Location search + autocomplete */}
+        <form onSubmit={handleSubmit} style={{ display: 'flex', position: 'relative' }}>
+          <div style={{ position: 'relative', flex: 1 }}>
+            <input
+              value={inputVal}
+              onChange={e => {
+                const v = e.target.value
+                setInputVal(v)
+                if (v.trim().length < 1) { setSuggestions([]); return }
+                setSuggestions(
+                  BERLIN_KIEZE.filter(k => k.toLowerCase().includes(v.toLowerCase())).slice(0, 7)
+                )
+              }}
+              onKeyDown={e => { if (e.key === 'Escape') setSuggestions([]) }}
+              onBlur={() => setTimeout(() => setSuggestions([]), 150)}
+              placeholder="Enter your Kiez…"
+              style={{
+                background: 'rgba(2,3,12,0.92)',
+                border: '1px solid rgba(0,245,255,0.22)',
+                borderRight: 'none',
+                borderRadius: suggestions.length > 0 ? '8px 0 0 0' : '8px 0 0 8px',
+                padding: '9px 14px',
+                color: 'rgba(210,235,255,0.88)',
+                fontFamily: 'Inter', fontSize: 12,
+                outline: 'none', width: 185,
+                backdropFilter: 'blur(12px)',
+                letterSpacing: '0.03em',
+                transition: 'border-radius 0.1s',
+              }}
+              onFocus={e => { e.target.style.borderColor = 'rgba(0,245,255,0.6)'; e.target.style.boxShadow = '0 0 16px rgba(0,245,255,0.15)' }}
+              onBlur={e =>  { e.target.style.borderColor = 'rgba(0,245,255,0.22)'; e.target.style.boxShadow = 'none' }}
+            />
+            {/* Suggestions dropdown */}
+            {suggestions.length > 0 && (
+              <div style={{
+                position: 'absolute', top: '100%', left: 0, right: 0,
+                background: 'rgba(4,5,14,0.98)',
+                border: '1px solid rgba(0,245,255,0.22)',
+                borderTop: 'none',
+                borderRadius: '0 0 8px 8px',
+                overflow: 'hidden',
+                zIndex: 200,
+                boxShadow: '0 8px 32px rgba(0,0,0,0.6)',
+              }}>
+                {suggestions.map((name, i) => (
+                  <div
+                    key={name}
+                    onMouseDown={() => { setInputVal(name); flyToKiez(name) }}
+                    style={{
+                      padding: '8px 14px',
+                      fontFamily: 'Inter', fontSize: 12,
+                      color: 'rgba(200,225,255,0.75)',
+                      cursor: 'pointer',
+                      borderBottom: i < suggestions.length - 1
+                        ? '1px solid rgba(255,255,255,0.04)' : 'none',
+                      display: 'flex', alignItems: 'center', gap: 8,
+                    }}
+                    onMouseEnter={e => { e.currentTarget.style.background = 'rgba(0,245,255,0.09)'; e.currentTarget.style.color = '#00f5ff' }}
+                    onMouseLeave={e => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.color = 'rgba(200,225,255,0.75)' }}
+                  >
+                    <span style={{ fontSize: 9, color: 'rgba(0,245,255,0.4)' }}>▸</span>
+                    {name}
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
           <button type="submit" style={{
             background: 'linear-gradient(135deg, rgba(0,245,255,0.2), rgba(168,85,247,0.2))',
             border: '1px solid rgba(0,245,255,0.45)',
-            borderRadius: '0 8px 8px 0',
+            borderRadius: suggestions.length > 0 ? '0 8px 0 0' : '0 8px 8px 0',
             padding: '9px 16px',
             color: '#00f5ff', fontFamily: 'Inter',
             fontSize: 11, fontWeight: 700,
             letterSpacing: '0.12em', cursor: 'pointer',
             textShadow: '0 0 8px #00f5ff',
+            transition: 'border-radius 0.1s',
           }}>
             GO
           </button>
