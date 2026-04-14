@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useCallback } from 'react'
+import { useState, useEffect, useRef, useCallback, useMemo } from 'react'
 import Map, { Marker, Source, Layer, NavigationControl } from 'react-map-gl/maplibre'
 import 'maplibre-gl/dist/maplibre-gl.css'
 import { motion, AnimatePresence } from 'framer-motion'
@@ -9,6 +9,37 @@ import { RESIDENTS, RESIDENT_TYPES } from '../data/residents'
 const MAP_STYLE = 'https://basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json'
 const BERLIN_GEOJSON =
   'https://tsb-opendata.s3.eu-central-1.amazonaws.com/bezirksgrenzen/bezirksgrenzen.geojson'
+
+// Fallback coordinates for Berlin neighbourhoods not covered by residents data
+const KIEZ_COORDS = {
+  'mitte':           { lng: 13.380, lat: 52.520, zoom: 13.5 },
+  'prenzlauer berg': { lng: 13.430, lat: 52.537, zoom: 13.5 },
+  'kreuzberg':       { lng: 13.388, lat: 52.497, zoom: 13.5 },
+  'friedrichshain':  { lng: 13.453, lat: 52.512, zoom: 13.5 },
+  'neukölln':        { lng: 13.435, lat: 52.480, zoom: 13.5 },
+  'neukoelln':       { lng: 13.435, lat: 52.480, zoom: 13.5 },
+  'charlottenburg':  { lng: 13.308, lat: 52.506, zoom: 13.5 },
+  'tiergarten':      { lng: 13.360, lat: 52.514, zoom: 13.5 },
+  'wedding':         { lng: 13.352, lat: 52.548, zoom: 13.5 },
+  'pankow':          { lng: 13.403, lat: 52.568, zoom: 13.5 },
+  'lichtenberg':     { lng: 13.500, lat: 52.510, zoom: 13.5 },
+  'tempelhof':       { lng: 13.385, lat: 52.470, zoom: 13.5 },
+  'treptow':         { lng: 13.460, lat: 52.490, zoom: 13.5 },
+  'köpenick':        { lng: 13.575, lat: 52.455, zoom: 13.5 },
+  'koepenick':       { lng: 13.575, lat: 52.455, zoom: 13.5 },
+  'grunewald':       { lng: 13.241, lat: 52.467, zoom: 13.5 },
+  'spandau':         { lng: 13.200, lat: 52.536, zoom: 13.0 },
+  'reinickendorf':   { lng: 13.332, lat: 52.567, zoom: 13.5 },
+  'schöneberg':      { lng: 13.352, lat: 52.490, zoom: 13.5 },
+  'schoeneberg':     { lng: 13.352, lat: 52.490, zoom: 13.5 },
+  'steglitz':        { lng: 13.320, lat: 52.460, zoom: 13.5 },
+  'wilmersdorf':     { lng: 13.310, lat: 52.495, zoom: 13.5 },
+  'moabit':          { lng: 13.340, lat: 52.528, zoom: 13.5 },
+  'gesundbrunnen':   { lng: 13.388, lat: 52.560, zoom: 13.5 },
+  'weissensee':      { lng: 13.465, lat: 52.555, zoom: 13.5 },
+  'weißensee':       { lng: 13.465, lat: 52.555, zoom: 13.5 },
+  'marzahn':         { lng: 13.567, lat: 52.540, zoom: 13.0 },
+}
 
 // ── Neon district palette ──────────────────────────────────────────
 const DISTRICT_PALETTE = [
@@ -130,15 +161,29 @@ export default function BerlinMap() {
   const [districtData, setDistrictData] = useState(null)
   const [is3D, setIs3D] = useState(false)
 
-  const [inputVal, setInputVal]       = useState('')
+  const [inputVal, setInputVal]         = useState('')
   const [submittedKiez, setSubmittedKiez] = useState('')
-  const [locationSet, setLocationSet] = useState(false)
+  const [locationSet, setLocationSet]   = useState(false)
+  const [highlightKiez, setHighlightKiez] = useState(null)
 
   const [popup, setPopup]           = useState(null)
   const [popupShown, setPopupShown] = useState(false)
 
   const zoom        = viewState.zoom
   const showMarkers = zoom >= 11
+
+  // ── Filter district GeoJSON to the matched kiez for highlight ──
+  const highlightData = useMemo(() => {
+    if (!districtData || !highlightKiez) return null
+    const search = highlightKiez.toLowerCase()
+    const words  = search.split(/\s+/).filter(w => w.length > 3)
+    const matched = districtData.features.filter(f => {
+      const name = (f.properties.Gemeinde_n || f.properties.name || f.properties.Name || '').toLowerCase()
+      return name.includes(search) || words.some(w => name.includes(w))
+    })
+    if (!matched.length) return null
+    return { type: 'FeatureCollection', features: matched }
+  }, [districtData, highlightKiez])
 
   // ── Fetch + colorise districts ─────────────────────────────────
   useEffect(() => {
@@ -206,6 +251,9 @@ export default function BerlinMap() {
     })
     setIs3D(false)
     setPopup(null)
+    setHighlightKiez(null)
+    setLocationSet(false)
+    setSubmittedKiez('')
   }, [])
 
   // ── Location submit ────────────────────────────────────────────
@@ -213,15 +261,56 @@ export default function BerlinMap() {
     e.preventDefault()
     const val = inputVal.trim()
     if (!val) return
+
     setSubmittedKiez(val)
     setLocationSet(true)
+    setHighlightKiez(val)
     clearTimeout(autoTimerRef.current)
+
+    // Find residents in this kiez → compute centroid for fly-to
+    const valLower = val.toLowerCase()
+    const hits = RESIDENTS.filter(r =>
+      r.kiez.toLowerCase().includes(valLower) ||
+      valLower.includes(r.kiez.toLowerCase())
+    )
+
+    const map = mapRef.current?.getMap()
+    if (map) {
+      let target = null
+
+      if (hits.length > 0) {
+        target = {
+          lng: hits.reduce((s, r) => s + r.lng, 0) / hits.length,
+          lat: hits.reduce((s, r) => s + r.lat, 0) / hits.length,
+          zoom: 13.5,
+        }
+      } else {
+        // Fall back to hardcoded neighbourhood lookup
+        const entry = Object.entries(KIEZ_COORDS).find(([k]) =>
+          k.includes(valLower) || valLower.includes(k)
+        )
+        if (entry) target = { lng: entry[1].lng, lat: entry[1].lat, zoom: entry[1].zoom }
+      }
+
+      if (target) {
+        setIs3D(true)
+        map.easeTo({
+          center: [target.lng, target.lat],
+          zoom: target.zoom,
+          pitch: 45,
+          bearing: -15,
+          duration: 2000,
+        })
+      }
+    }
+
+    // Show a dispatch from this kiez after the fly completes
     setTimeout(() => {
       if (!popupShown) {
         setPopup(pickResident(val))
         setPopupShown(true)
       }
-    }, 1800)
+    }, 2200)
   }
 
   const legend = Object.entries(RESIDENT_TYPES).map(([key, val]) => ({
@@ -254,6 +343,31 @@ export default function BerlinMap() {
             <Layer {...districtLabel} />
           </Source>
         )}
+
+        {/* ── Kiez highlight ─────────────────────────────────── */}
+        {highlightData && (
+          <Source id="kiez-highlight" type="geojson" data={highlightData}>
+            {/* soft fill */}
+            <Layer
+              id="kiez-highlight-fill"
+              type="fill"
+              paint={{ 'fill-color': '#00f5ff', 'fill-opacity': 0.1 }}
+            />
+            {/* outer glow */}
+            <Layer
+              id="kiez-highlight-glow"
+              type="line"
+              paint={{ 'line-color': '#00f5ff', 'line-width': 12, 'line-blur': 20, 'line-opacity': 0.45 }}
+            />
+            {/* crisp border */}
+            <Layer
+              id="kiez-highlight-border"
+              type="line"
+              paint={{ 'line-color': '#00f5ff', 'line-width': 2, 'line-opacity': 0.9 }}
+            />
+          </Source>
+        )}
+
         <Layer {...buildings3d} />
         <Layer {...buildingsTop} />
 
