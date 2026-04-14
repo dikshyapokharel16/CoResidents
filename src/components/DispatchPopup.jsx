@@ -43,6 +43,12 @@ export default function DispatchPopup({ resident, onClose }) {
             {/* Close button */}
             <button style={s.closeBtn} onClick={onClose} aria-label="close">✕</button>
 
+            {/* Neighbourhood badge */}
+            <div style={s.kiezBadge}>
+              <span style={s.kiezDot} />
+              {resident.kiez}
+            </div>
+
             {/* Header */}
             <div style={s.header}>
               <div style={{
@@ -57,9 +63,6 @@ export default function DispatchPopup({ resident, onClose }) {
                 <div style={{ color: type.color, fontSize: 12, fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', fontFamily: 'Inter' }}>
                   {type.label}
                 </div>
-                <div style={{ color: 'rgba(224,240,255,0.4)', fontSize: 12, fontFamily: 'Inter', marginTop: 2 }}>
-                  {resident.kiez}
-                </div>
               </div>
               <div style={{
                 ...stressBadge,
@@ -72,16 +75,17 @@ export default function DispatchPopup({ resident, onClose }) {
             </div>
 
             {/* Divider */}
-            <div style={{ height: 1, background: 'rgba(212,168,136,0.1)', margin: '4px 0 16px' }} />
+            <div style={{ height: 1, background: 'rgba(0,245,255,0.08)', margin: '4px 0 16px' }} />
 
             {/* Dispatch — first-person narrative */}
-            <div style={s.dispatchLabel}>Dispatch</div>
+            <div style={s.dispatchLabel}>Dispatch from {resident.kiez}</div>
             <p style={s.dispatch}>{resident.dispatch}</p>
 
             {/* Action section */}
             <div style={{ ...s.actionBox, borderColor: `${type.color}30` }}>
               <div style={{ ...s.actionLabel, color: type.color }}>
-                <span style={{ fontSize: 12 }}>→</span> Your action
+                <span style={{ fontSize: 12 }}>→</span> Neighbourhood action
+                <span style={{ marginLeft: 8, fontSize: 9, color: 'rgba(0,245,255,0.5)', fontWeight: 400, letterSpacing: '0.06em' }}>· {resident.kiez}</span>
               </div>
               <p style={s.actionText}>{resident.action}</p>
             </div>
@@ -152,6 +156,22 @@ const s = {
     color: 'rgba(224,240,255,0.3)', fontSize: 14,
     cursor: 'pointer', padding: '4px 6px', lineHeight: 1,
     fontFamily: 'Inter',
+  },
+  kiezBadge: {
+    display: 'inline-flex', alignItems: 'center', gap: 7,
+    background: 'rgba(0,245,255,0.07)',
+    border: '1px solid rgba(0,245,255,0.25)',
+    borderRadius: 20, padding: '5px 14px',
+    fontFamily: 'Inter', fontSize: 11, fontWeight: 600,
+    letterSpacing: '0.1em', textTransform: 'uppercase',
+    color: '#00f5ff', marginBottom: 18, alignSelf: 'flex-start',
+    boxShadow: '0 0 14px rgba(0,245,255,0.1)',
+  },
+  kiezDot: {
+    display: 'inline-block', width: 5, height: 5,
+    borderRadius: '50%', background: '#00f5ff',
+    boxShadow: '0 0 6px rgba(0,245,255,0.8)',
+    flexShrink: 0,
   },
   header: {
     display: 'flex', alignItems: 'center',

@@ -421,10 +421,8 @@ export default function BerlinMap() {
     }
 
     setTimeout(() => {
-      if (!popupShown) {
-        setPopup(pickResident(val))
-        setPopupShown(true)
-      }
+      setPopup(pickResident(val))
+      setPopupShown(true)
     }, 2400)
   }, [popupShown])
 
@@ -769,6 +767,32 @@ export default function BerlinMap() {
             GO
           </button>
         </form>
+
+        {/* ── Search dispatch ───────────────────────────────── */}
+        <motion.button
+          onClick={() => setPopup(pickResident(submittedKiez || ''))}
+          style={{
+            display: 'flex', alignItems: 'center', gap: 8,
+            background: 'rgba(0,245,255,0.07)',
+            border: '1px solid rgba(0,245,255,0.35)',
+            borderRadius: 8, padding: '9px 14px',
+            fontFamily: 'Inter', fontSize: 10.5, fontWeight: 700,
+            letterSpacing: '0.1em', textTransform: 'uppercase',
+            color: '#00f5ff', cursor: 'pointer',
+            boxShadow: '0 0 16px rgba(0,245,255,0.1)',
+            transition: 'background 0.2s, box-shadow 0.2s',
+            width: '100%',
+          }}
+          whileHover={{ backgroundColor: 'rgba(0,245,255,0.13)', boxShadow: '0 0 24px rgba(0,245,255,0.2)' }}
+          whileTap={{ scale: 0.97 }}
+        >
+          <motion.span
+            animate={{ opacity: [1, 0.4, 1] }}
+            transition={{ duration: 1.8, repeat: Infinity }}
+            style={{ fontSize: 9, lineHeight: 1 }}
+          >◈</motion.span>
+          {submittedKiez ? `Dispatch from ${submittedKiez}` : 'Search dispatch near me'}
+        </motion.button>
 
         {/* ── Pin a location on the map ─────────────────────── */}
         <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
