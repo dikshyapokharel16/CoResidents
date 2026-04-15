@@ -22,7 +22,7 @@ function buildNarrative(resident, type) {
     `and recovery is no longer guaranteed.`
 }
 
-export default function IgnoredScreen({ resident, type, Icon, onClose, onReconsider, onViewHealth }) {
+export default function IgnoredScreen({ resident, type, Icon, onClose, onViewHealth }) {
   const days   = daysUnresolved(resident.id)
   const trend  = popTrendAfterIgnore(type.populationStatus)
   const tColor = trendColor(trend)
@@ -114,33 +114,15 @@ export default function IgnoredScreen({ resident, type, Icon, onClose, onReconsi
 
       </div>
 
-      {/* Buttons */}
-      <div style={s.btnRow}>
-        <motion.button
-          style={{ ...s.btnReconsider, borderColor: `${type.color}55`, color: type.color }}
-          whileHover={{ backgroundColor: `${type.color}18`, scale: 1.01 }}
-          whileTap={{ scale: 0.97 }}
-          onClick={onReconsider}
-        >
-          ↩ Reconsider
-        </motion.button>
-        <motion.button
-          style={{ ...s.btnReconsider, borderColor: 'rgba(0,245,255,0.3)', color: '#00f5ff' }}
-          whileHover={{ backgroundColor: 'rgba(0,245,255,0.08)', scale: 1.01 }}
-          whileTap={{ scale: 0.97 }}
-          onClick={onViewHealth}
-        >
-          See city health
-        </motion.button>
-        <motion.button
-          style={s.btnLeave}
-          whileHover={{ backgroundColor: 'rgba(255,255,255,0.06)' }}
-          whileTap={{ scale: 0.97 }}
-          onClick={onClose}
-        >
-          Leave
-        </motion.button>
-      </div>
+      {/* Button */}
+      <motion.button
+        style={s.btnHealth}
+        whileHover={{ backgroundColor: 'rgba(0,245,255,0.1)', scale: 1.01 }}
+        whileTap={{ scale: 0.97 }}
+        onClick={onViewHealth}
+      >
+        See city health
+      </motion.button>
     </motion.div>
   )
 }
@@ -176,29 +158,29 @@ const s = {
   sectionLabel: {
     fontFamily: 'Inter', fontSize: 9, fontWeight: 600,
     letterSpacing: '0.2em', textTransform: 'uppercase',
-    color: 'rgba(224,80,80,0.35)', marginBottom: 12,
+    color: 'rgba(224,80,80,0.7)', marginBottom: 12,
   },
   narrative: {
     fontFamily: "'Playfair Display', serif",
-    fontSize: 16, lineHeight: 1.88,
-    color: 'rgba(224,240,255,0.6)',
+    fontSize: 17, lineHeight: 1.88,
+    color: 'rgba(224,240,255,0.85)',
     fontStyle: 'italic', fontWeight: 400,
     margin: '0 0 24px',
   },
   missedBox: {
     border: '1px solid',
     borderRadius: 10, padding: '16px 18px',
-    background: 'rgba(224,80,80,0.03)',
+    background: 'rgba(224,80,80,0.06)',
     marginBottom: 28,
   },
   missedLabel: {
     fontFamily: 'Inter', fontSize: 9, fontWeight: 600,
     letterSpacing: '0.16em', textTransform: 'uppercase',
-    color: 'rgba(224,80,80,0.35)', marginBottom: 8,
+    color: 'rgba(224,80,80,0.65)', marginBottom: 8,
   },
   missedText: {
-    fontFamily: 'Inter', fontSize: 13, lineHeight: 1.65,
-    color: 'rgba(224,240,255,0.35)', fontWeight: 300, margin: 0,
+    fontFamily: 'Inter', fontSize: 14, lineHeight: 1.65,
+    color: 'rgba(224,240,255,0.65)', fontWeight: 300, margin: 0,
     fontStyle: 'italic',
   },
   statsRow: {
@@ -208,7 +190,7 @@ const s = {
   statCell: {
     border: '1px solid',
     borderRadius: 10, padding: '16px 14px',
-    background: 'rgba(224,80,80,0.03)',
+    background: 'rgba(224,80,80,0.05)',
   },
   statNum: {
     fontFamily: "'Playfair Display', serif",
@@ -219,28 +201,16 @@ const s = {
   statLabel: {
     fontFamily: 'Inter', fontSize: 9, fontWeight: 500,
     letterSpacing: '0.1em', textTransform: 'uppercase',
-    color: 'rgba(224,240,255,0.25)', marginTop: 4,
+    color: 'rgba(224,240,255,0.5)', marginTop: 4,
   },
-  btnRow: {
-    display: 'flex', gap: 14,
-  },
-  btnReconsider: {
-    flex: 1, padding: '14px 0',
+  btnHealth: {
+    width: '100%', padding: '15px 0',
     background: 'transparent',
-    border: '1.5px solid',
+    border: '1.5px solid rgba(0,245,255,0.35)',
     borderRadius: 10, cursor: 'pointer',
+    color: '#00f5ff',
     fontFamily: 'Inter', fontSize: 13, fontWeight: 600,
     letterSpacing: '0.06em',
-    transition: 'background 0.2s',
-  },
-  btnLeave: {
-    flex: 1, padding: '14px 0',
-    background: 'rgba(237,228,216,0.04)',
-    border: '1px solid rgba(237,228,216,0.08)',
-    borderRadius: 10, cursor: 'pointer',
-    color: 'rgba(224,240,255,0.28)',
-    fontFamily: 'Inter', fontSize: 13, fontWeight: 500,
-    letterSpacing: '0.04em',
     transition: 'background 0.2s',
   },
 }

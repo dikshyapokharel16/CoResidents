@@ -113,8 +113,14 @@ export default function DispatchPopup({ resident, onClose }) {
                 Ignore
               </motion.button>
               <motion.button
-                style={{ ...s.btnDo, borderColor: type.color, color: type.color }}
-                whileHover={{ backgroundColor: `${type.color}22`, scale: 1.01 }}
+                style={{
+                  ...s.btnDo,
+                  background: type.color,
+                  border: `2px solid ${type.color}`,
+                  color: '#04060f',
+                  boxShadow: `0 0 22px ${type.color}55`,
+                }}
+                whileHover={{ opacity: 0.88, scale: 1.02 }}
                 whileTap={{ scale: 0.97 }}
                 onClick={handleDo}
               >
@@ -146,7 +152,6 @@ export default function DispatchPopup({ resident, onClose }) {
             type={type}
             Icon={Icon}
             onClose={onClose}
-            onReconsider={() => setPhase('dispatch')}
             onViewHealth={() => setPhase('cityhealth')}
           />
         )}
@@ -223,25 +228,25 @@ const s = {
   },
   dispatch: {
     fontFamily: "'Playfair Display', serif",
-    fontSize: 18, lineHeight: 1.88,
-    color: 'rgba(224,240,255,0.85)',
+    fontSize: 19, lineHeight: 1.88,
+    color: 'rgba(224,240,255,0.9)',
     fontStyle: 'italic', fontWeight: 400,
     margin: '0 0 28px',
   },
   actionBox: {
     border: '1px solid',
     borderRadius: 10, padding: '20px 20px',
-    background: 'rgba(212,104,42,0.04)',
+    background: 'rgba(212,104,42,0.07)',
     marginBottom: 28,
   },
   actionLabel: {
-    fontFamily: 'Inter', fontSize: 10, fontWeight: 700,
+    fontFamily: 'Inter', fontSize: 11, fontWeight: 700,
     letterSpacing: '0.12em', textTransform: 'uppercase',
-    marginBottom: 8, display: 'flex', gap: 6, alignItems: 'center',
+    marginBottom: 10, display: 'flex', gap: 6, alignItems: 'center',
   },
   actionText: {
-    fontFamily: 'Inter', fontSize: 14, lineHeight: 1.65,
-    color: 'rgba(224,240,255,0.55)', fontWeight: 300, margin: 0,
+    fontFamily: 'Inter', fontSize: 15, lineHeight: 1.65,
+    color: 'rgba(224,240,255,0.8)', fontWeight: 400, margin: 0,
   },
   btnRow: {
     display: 'flex', gap: 16,
