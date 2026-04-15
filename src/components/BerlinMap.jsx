@@ -584,7 +584,7 @@ export default function BerlinMap({ selectedKiez }) {
           </Marker>
         ))}
 
-        <NavigationControl position="top-right" style={{ marginTop: 90 }} />
+        <NavigationControl position="top-right" style={{ marginTop: 90, marginRight: 164 }} />
 
         {/* ── User-dropped pin (draggable) ──────────────────── */}
         {userPin && (
@@ -653,10 +653,33 @@ export default function BerlinMap({ selectedKiez }) {
         background: 'radial-gradient(ellipse at center, transparent 35%, rgba(18,12,8,0.72) 100%)',
       }} />
 
+      {/* ── Centered header ───────────────────────────────────── */}
+      <motion.div
+        style={{
+          position: 'absolute', top: 26, left: 0, right: 160,
+          display: 'flex', flexDirection: 'column', alignItems: 'center',
+          pointerEvents: 'none', zIndex: 10,
+        }}
+        initial={{ opacity: 0, y: -8 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.5, duration: 0.9 }}
+      >
+        <div style={{
+          fontFamily: "'Playfair Display', serif",
+          fontSize: 22, fontWeight: 700, fontStyle: 'italic',
+          letterSpacing: '0.02em',
+          color: 'rgba(237,228,216,0.88)',
+          textShadow: '0 0 30px rgba(0,245,255,0.14)',
+          lineHeight: 1.3, textAlign: 'center',
+        }}>
+          Click a resident. Read their dispatch.
+        </div>
+      </motion.div>
+
       {/* ── 2D/3D mode badge ──────────────────────────────────── */}
       <motion.div
         style={{
-          position: 'absolute', top: 28, right: 110,
+          position: 'absolute', top: 28, right: 174,
           display: 'flex', alignItems: 'center', gap: 10, zIndex: 10,
         }}
         initial={{ opacity: 0 }}
@@ -725,25 +748,6 @@ export default function BerlinMap({ selectedKiez }) {
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.5, duration: 1 }}
       >
-        {/* Headline */}
-        <div>
-          <div style={{
-            fontFamily: "'Playfair Display', serif", fontSize: 28,
-            fontWeight: 700, letterSpacing: '0.04em',
-            color: 'rgba(237,228,216,0.92)', lineHeight: 1.1,
-            textShadow: '0 0 40px rgba(0,245,255,0.18)',
-          }}>
-            Who else lives here?
-          </div>
-          <div style={{
-            fontFamily: 'Inter', fontSize: 11, fontWeight: 300,
-            color: 'rgba(224,240,255,0.4)', marginTop: 5, letterSpacing: '0.04em',
-          }}>
-            {locationSet
-              ? `Viewing: ${submittedKiez}`
-              : `${RESIDENTS.length} stress reports · click a marker to explore in 3D`}
-          </div>
-        </div>
 
         {/* ── Search any location ────────────────────────────── */}
         <form onSubmit={handleSubmit} style={{ display: 'flex', position: 'relative' }}>
@@ -1007,7 +1011,7 @@ export default function BerlinMap({ selectedKiez }) {
       {/* ── Legend ────────────────────────────────────────────── */}
       <motion.div
         style={{
-          position: 'absolute', bottom: 32, right: 24,
+          position: 'absolute', bottom: 28, left: 24,
           background: 'rgba(4,6,15,0.94)',
           border: '1px solid rgba(0,245,255,0.14)',
           borderRadius: 14, padding: '14px 16px',
@@ -1054,21 +1058,6 @@ export default function BerlinMap({ selectedKiez }) {
         </div>
       </motion.div>
 
-      {/* ── Bottom-left status ────────────────────────────────── */}
-      <motion.div
-        style={{
-          position: 'absolute', bottom: 32, left: 28,
-          fontFamily: 'Inter', fontSize: 9.5, letterSpacing: '0.1em',
-          color: 'rgba(224,240,255,0.25)', zIndex: 10,
-        }}
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ delay: 1.2 }}
-      >
-        {!is3D && zoom < 11  && '2D · Neighbourhood overview'}
-        {!is3D && zoom >= 11 && '2D · Kiez level · click to dive in'}
-        {is3D && '3D · Street level active · buildings extruded'}
-      </motion.div>
 
       <div style={{
         position: 'absolute', bottom: 8, right: 8, zIndex: 10,

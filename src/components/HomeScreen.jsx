@@ -6,11 +6,9 @@ export default function HomeScreen() {
   const [selectedKiez, setSelectedKiez] = useState(null)
 
   return (
-    <div style={{ width: '100vw', height: '100vh', display: 'flex', flexDirection: 'column', background: '#04060f' }}>
+    <div style={{ width: '100vw', height: '100vh', position: 'relative', background: '#04060f' }}>
+      <BerlinMap selectedKiez={selectedKiez} />
       <KiezBar selectedKiez={selectedKiez} onSelectKiez={setSelectedKiez} />
-      <div style={{ flex: 1, position: 'relative', overflow: 'hidden' }}>
-        <BerlinMap selectedKiez={selectedKiez} />
-      </div>
     </div>
   )
 }
