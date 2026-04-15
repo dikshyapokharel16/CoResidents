@@ -218,7 +218,7 @@ export default function BerlinMap({ selectedKiez }) {
 
   const [viewState, setViewState] = useState({
     longitude: 13.405, latitude: 52.52,
-    zoom: 10.5,
+    zoom: 11.8,
     pitch: 0,     // START FLAT (2D)
     bearing: 0,
   })
@@ -897,7 +897,11 @@ export default function BerlinMap({ selectedKiez }) {
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.97 }}
           >
-            📍 {clickToPlace ? 'Click the map…' : 'Add location on map'}
+            <svg width="11" height="14" viewBox="0 0 11 14" fill="none" style={{ flexShrink: 0 }}>
+              <path d="M5.5 0C2.74 0 0.5 2.24 0.5 5C0.5 8.75 5.5 14 5.5 14C5.5 14 10.5 8.75 10.5 5C10.5 2.24 8.26 0 5.5 0Z" fill="rgba(255,255,255,0.85)"/>
+              <circle cx="5.5" cy="5" r="1.8" fill="rgba(4,6,15,0.7)"/>
+            </svg>
+            {clickToPlace ? 'Click the map…' : 'Add location on map'}
           </motion.button>
 
           {userPin && (
@@ -960,11 +964,14 @@ export default function BerlinMap({ selectedKiez }) {
             exit={{ opacity: 0 }}
           >
             <motion.div
-              style={{ fontSize: 36, filter: 'drop-shadow(0 0 16px #e08858)' }}
+              style={{ filter: 'drop-shadow(0 0 16px #e08858)' }}
               animate={{ y: [0, -8, 0] }}
               transition={{ duration: 1.4, repeat: Infinity }}
             >
-              📍
+              <svg width="32" height="40" viewBox="0 0 11 14" fill="none">
+                <path d="M5.5 0C2.74 0 0.5 2.24 0.5 5C0.5 8.75 5.5 14 5.5 14C5.5 14 10.5 8.75 10.5 5C10.5 2.24 8.26 0 5.5 0Z" fill="rgba(255,255,255,0.9)"/>
+                <circle cx="5.5" cy="5" r="1.8" fill="rgba(4,6,15,0.7)"/>
+              </svg>
             </motion.div>
             <div style={{
               background: 'rgba(4,6,15,0.96)', border: '1px solid rgba(0,245,255,0.45)',
@@ -982,31 +989,6 @@ export default function BerlinMap({ selectedKiez }) {
         )}
       </AnimatePresence>
 
-      {/* ── Bottom hint ───────────────────────────────────────── */}
-      <AnimatePresence mode="wait">
-        {!is3D && !showMarkers && (
-          <motion.div key="zoom-hint"
-            style={{ ...hint, border: '1px solid rgba(0,245,255,0.3)', color: 'rgba(0,245,255,0.65)' }}
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: [0.6, 1, 0.6], y: 0 }}
-            exit={{ opacity: 0, y: 8 }}
-            transition={{ duration: 2.2, repeat: Infinity }}
-          >
-            Scroll to zoom · markers appear at street level
-          </motion.div>
-        )}
-        {!is3D && showMarkers && (
-          <motion.div key="click-hint"
-            style={{ ...hint, border: '1px solid rgba(255,0,204,0.4)', color: 'rgba(255,0,204,0.7)' }}
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: [0.6, 1, 0.6], y: 0 }}
-            exit={{ opacity: 0, y: 8 }}
-            transition={{ duration: 2.5, repeat: Infinity }}
-          >
-            Click a resident to dive into 3D · read their dispatch
-          </motion.div>
-        )}
-      </AnimatePresence>
 
       {/* ── Legend ────────────────────────────────────────────── */}
       <motion.div
