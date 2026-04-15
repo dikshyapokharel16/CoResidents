@@ -1,5 +1,5 @@
-import { useEffect, useState, useMemo } from 'react'
-import { motion, AnimatePresence } from 'framer-motion'
+import { useEffect, useState } from 'react'
+import { motion } from 'framer-motion'
 import { RESIDENT_TYPES } from '../data/residents'
 import { icons } from './icons'
 
@@ -19,19 +19,36 @@ const PARTICLES = Array.from({ length: 22 }, (_, i) => ({
   driftY: (Math.random() - 0.5) * 60,
 }))
 
+const CURSOR_SIZE = 110
+
 export default function LandingScreen({ onComplete }) {
   const [ready, setReady] = useState(false)
-  const [btnHovered, setBtnHovered] = useState(false)
+  const [mouse, setMouse] = useState({ x: -300, y: -300 })
+  const [clicking, setClicking] = useState(false)
 
   useEffect(() => {
     const t = setTimeout(() => setReady(true), 200)
     return () => clearTimeout(t)
   }, [])
 
+  useEffect(() => {
+    const onMove  = e => setMouse({ x: e.clientX, y: e.clientY })
+    const onDown  = () => setClicking(true)
+    const onUp    = () => setClicking(false)
+    window.addEventListener('mousemove', onMove)
+    window.addEventListener('mousedown', onDown)
+    window.addEventListener('mouseup',   onUp)
+    return () => {
+      window.removeEventListener('mousemove', onMove)
+      window.removeEventListener('mousedown', onDown)
+      window.removeEventListener('mouseup',   onUp)
+    }
+  }, [])
+
   const staggerDelay = (i) => ({ delay: 0.3 + i * 0.18, duration: 0.7, ease: [0.22, 1, 0.36, 1] })
 
   return (
-    <div style={s.root}>
+    <div style={s.root} onClick={onComplete}>
 
       {/* ── Animated grid background ── */}
       <motion.div
@@ -64,6 +81,39 @@ export default function LandingScreen({ onComplete }) {
           transition={{ duration: p.duration, delay: p.delay, repeat: Infinity, ease: 'easeInOut' }}
         />
       ))}
+
+      {/* ── Custom cursor: position tracker ── */}
+      <motion.div
+        style={{
+          position: 'fixed', top: 0, left: 0, zIndex: 99999,
+          pointerEvents: 'none',
+        }}
+        animate={{ x: mouse.x - CURSOR_SIZE / 2, y: mouse.y - CURSOR_SIZE / 2 }}
+        transition={{ type: 'spring', stiffness: 350, damping: 30, mass: 0.4 }}
+      >
+        {/* Circle with pulse / click scale */}
+        <motion.div
+          style={{
+            width: CURSOR_SIZE, height: CURSOR_SIZE,
+            borderRadius: '50%',
+            border: '1.5px solid rgba(0,245,255,0.75)',
+            boxShadow: '0 0 28px rgba(0,245,255,0.4), inset 0 0 28px rgba(0,245,255,0.07)',
+            background: 'rgba(4,6,15,0.4)',
+            backdropFilter: 'blur(4px)',
+            display: 'flex', flexDirection: 'column',
+            alignItems: 'center', justifyContent: 'center', gap: 5,
+          }}
+          animate={{ scale: clicking ? 0.86 : [1, 1.05, 1] }}
+          transition={
+            clicking
+              ? { duration: 0.08 }
+              : { duration: 2.6, repeat: Infinity, ease: 'easeInOut' }
+          }
+        >
+          <span style={s.cursorLine}>ENTER</span>
+          <span style={s.cursorLine}>BERLIN</span>
+        </motion.div>
+      </motion.div>
 
       {/* ── Content column ── */}
       <div style={s.content}>
@@ -132,32 +182,12 @@ export default function LandingScreen({ onComplete }) {
           Dispatches from the non-human city.
         </motion.p>
 
-        {/* Enter button */}
-        <motion.button
-          style={{
-            ...s.btn,
-            boxShadow: btnHovered
-              ? '0 0 32px rgba(0,245,255,0.5), 0 0 64px rgba(0,245,255,0.2)'
-              : '0 0 16px rgba(0,245,255,0.2)',
-            background: btnHovered ? 'rgba(0,245,255,0.08)' : 'transparent',
-          }}
-          initial={{ opacity: 0, y: 16 }}
-          animate={ready ? { opacity: 1, y: 0 } : {}}
-          transition={staggerDelay(5)}
-          onMouseEnter={() => setBtnHovered(true)}
-          onMouseLeave={() => setBtnHovered(false)}
-          onClick={onComplete}
-          whileTap={{ scale: 0.97 }}
-        >
-          Enter Berlin →
-        </motion.button>
-
         {/* Coordinate label */}
         <motion.div
           style={s.coord}
           initial={{ opacity: 0 }}
           animate={ready ? { opacity: 1 } : {}}
-          transition={staggerDelay(6)}
+          transition={staggerDelay(5)}
         >
           BERLIN · 52.520°N · 13.405°E
         </motion.div>
@@ -174,6 +204,7 @@ const s = {
     background: '#04060f',
     display: 'flex', alignItems: 'center', justifyContent: 'center',
     overflow: 'hidden',
+    cursor: 'none',
   },
   grid: {
     position: 'absolute', inset: 0, pointerEvents: 'none',
@@ -229,20 +260,6 @@ const s = {
     textTransform: 'uppercase',
     margin: 0,
   },
-  btn: {
-    fontFamily: "'Inter', sans-serif",
-    fontWeight: 600,
-    fontSize: 13,
-    letterSpacing: '0.18em',
-    textTransform: 'uppercase',
-    color: '#00f5ff',
-    border: '1px solid rgba(0,245,255,0.6)',
-    borderRadius: 2,
-    padding: '14px 40px',
-    cursor: 'pointer',
-    transition: 'background 0.2s, box-shadow 0.2s',
-    marginTop: 8,
-  },
   coord: {
     fontFamily: "'Inter', sans-serif",
     fontWeight: 300,
@@ -250,6 +267,15 @@ const s = {
     letterSpacing: '0.22em',
     color: 'rgba(0,245,255,0.2)',
     textTransform: 'uppercase',
-    marginTop: 4,
+    marginTop: 8,
+  },
+  cursorLine: {
+    fontFamily: "'Inter', sans-serif",
+    fontSize: 9, fontWeight: 700,
+    letterSpacing: '0.22em',
+    textTransform: 'uppercase',
+    color: '#00f5ff',
+    lineHeight: 1,
+    userSelect: 'none',
   },
 }
