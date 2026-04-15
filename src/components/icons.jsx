@@ -74,4 +74,17 @@ const spree = (c, size = 22) => (
   </svg>
 )
 
-export const icons = { fox, bee, bird, tree, boar, spree }
+const street = (c, size = 22) => (
+  <svg viewBox="0 0 32 32" width={size} height={size} fill="none"
+    stroke={c} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+    <line x1="8" y1="4" x2="8" y2="28" />
+    <line x1="24" y1="4" x2="24" y2="28" />
+    <line x1="16" y1="6" x2="16" y2="11" />
+    <line x1="16" y1="14" x2="16" y2="19" />
+    <line x1="16" y1="22" x2="16" y2="27" />
+    <path d="M4 10 Q6 8 8 10" strokeOpacity="0.4" />
+    <path d="M24 22 Q26 20 28 22" strokeOpacity="0.4" />
+  </svg>
+)
+
+export const icons = { fox, bee, bird, tree, boar, spree, street }

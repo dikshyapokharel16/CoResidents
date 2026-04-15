@@ -1,10 +1,11 @@
 export const RESIDENT_TYPES = {
-  fox:   { emoji: '🦊', color: '#ff6600', label: 'Urban Fox',       populationStatus: 'Recovering' },
-  bee:   { emoji: '🐝', color: '#ffee00', label: 'Solitary Bee',    populationStatus: 'At Risk'    },
-  bird:  { emoji: '🐦', color: '#00f5ff', label: 'Migratory Bird',  populationStatus: 'At Risk'    },
-  tree:  { emoji: '🌳', color: '#00ff88', label: 'Linden Tree',     populationStatus: 'Stable'     },
-  boar:  { emoji: '🐗', color: '#ff00cc', label: 'Wild Boar',       populationStatus: 'Stable'     },
-  spree: { emoji: '🌊', color: '#9d00ff', label: 'Spree River',     populationStatus: 'At Risk'    },
+  fox:    { emoji: '🦊', color: '#ff6600', label: 'Urban Fox',       populationStatus: 'Recovering' },
+  bee:    { emoji: '🐝', color: '#ffee00', label: 'Solitary Bee',    populationStatus: 'At Risk'    },
+  bird:   { emoji: '🐦', color: '#00f5ff', label: 'Migratory Bird',  populationStatus: 'At Risk'    },
+  tree:   { emoji: '🌳', color: '#00ff88', label: 'Linden Tree',     populationStatus: 'Stable'     },
+  boar:   { emoji: '🐗', color: '#ff00cc', label: 'Wild Boar',       populationStatus: 'Stable'     },
+  spree:  { emoji: '🌊', color: '#9d00ff', label: 'Spree River',     populationStatus: 'At Risk'    },
+  street: { emoji: '🛣️', color: '#aac8e8', label: 'Urban Street',    populationStatus: 'At Risk'    },
 }
 
 export const RESIDENTS = [
@@ -309,6 +310,17 @@ export const RESIDENTS = [
     aftermath: 'BSR delivered locking bars to the affected block. Within ten days, the daytime visits stopped entirely. By the following month, the sounder had retreated to the forest edge and resumed nocturnal-only activity.',
     imagePrompt: 'wild boar retreating into Marzahn forest edge at night, Berlin Plattenbau buildings in distance, streetlight glow, cinematic wildlife photography',
   },
+  // ── Street ────────────────────────────────────────────────────────
+  {
+    id: 34, type: 'street', lng: 13.388, lat: 52.497,
+    kiez: 'Kreuzberg', stress: 'Heat Island',
+    detail: 'Surface temperature 52°C in July. Last street tree removed in 2019. No shade for 380 metres.',
+    dispatch: "I am Oranienstrasse. On July 19th my surface reached 52°C. The last tree on this block was removed in 2019 — utilities work, they said. Since then I hold heat from sunrise until 2am. I radiate it into basements, into passing shoes, into the air above me. Cars brake on me, leaving tyre particles. Rain washes them straight into the drain. I did not choose to be this. I was built to carry everything and given nothing back. A city that removes trees from its streets does not lose them slowly — it loses them all at once, and what remains is just a surface that remembers what shade felt like.",
+    action: "Support street tree planting in your Kiez via berlin.de/stadtgruen — one linden per block reduces pavement surface temperature by up to 6°C and returns the street its shadow.",
+    aftermath: "A linden was planted at the north end of the block in October. The following July, the shaded section measured 6°C cooler at 3pm. Two neighbours submitted a second planting application the same week. The pavement did not forget — but it had, at last, somewhere to begin.",
+    imagePrompt: 'empty Berlin street in extreme summer heat, asphalt shimmering, no trees, heat haze rising from surface, documentary urban photography',
+  },
+
   {
     id: 33, type: 'spree', lng: 13.308, lat: 52.518,
     kiez: 'Charlottenburg', stress: 'Thermal Pollution',

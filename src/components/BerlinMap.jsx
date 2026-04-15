@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import ResidentMarker from './ResidentMarker'
 import DispatchPopup from './DispatchPopup'
 import { RESIDENTS, RESIDENT_TYPES } from '../data/residents'
+import { icons } from './icons'
 
 const MAP_STYLE = 'https://basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json'
 const BERLIN_GEOJSON =
@@ -1013,7 +1014,15 @@ export default function BerlinMap({ selectedKiez }) {
         </div>
         {legend.map(item => (
           <div key={item.key} style={{ display: 'flex', alignItems: 'center', gap: 9, marginBottom: 8 }}>
-            <span style={{ fontSize: 17, lineHeight: 1 }}>{item.emoji}</span>
+            <div style={{
+              width: 28, height: 28, borderRadius: '50%', flexShrink: 0,
+              background: `${item.color}14`,
+              border: `1.5px solid ${item.color}66`,
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              boxShadow: `0 0 8px ${item.color}33`,
+            }}>
+              {icons[item.key] && icons[item.key](item.color, 15)}
+            </div>
             <span style={{
               fontFamily: 'Inter', fontSize: 12, flex: 1,
               color: item.color, textShadow: `0 0 8px ${item.color}77`,
