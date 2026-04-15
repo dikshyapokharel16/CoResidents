@@ -212,7 +212,7 @@ function nearestResident(lng, lat) {
 }
 
 // ── Component ──────────────────────────────────────────────────────
-export default function BerlinMap() {
+export default function BerlinMap({ selectedKiez }) {
   const mapRef = useRef()
   const autoTimerRef = useRef()
 
@@ -442,6 +442,15 @@ export default function BerlinMap() {
     }, 2400)
   }, [popupShown])
 
+  // ── Respond to external Kiez selection from KiezBar ───────────
+  const flyToKiezRef = useRef(null)
+  useEffect(() => { flyToKiezRef.current = flyToKiez }, [flyToKiez])
+  useEffect(() => {
+    if (selectedKiez && flyToKiezRef.current) {
+      flyToKiezRef.current(selectedKiez)
+    }
+  }, [selectedKiez])
+
   // ── Location submit ────────────────────────────────────────────
   const handleSubmit = (e) => {
     e.preventDefault()
@@ -486,7 +495,7 @@ export default function BerlinMap() {
 
   return (
     <motion.div
-      style={{ width: '100vw', height: '100vh', position: 'relative', background: '#04060f' }}
+      style={{ width: '100%', height: '100%', position: 'relative', background: '#04060f' }}
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ duration: 1.2 }}
