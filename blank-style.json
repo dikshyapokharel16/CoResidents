@@ -1,0 +1,13 @@
+{
+  "version": 8,
+  "name": "blank-dark",
+  "glyphs": "https://demotiles.maplibre.org/font/{fontstack}/{range}.pbf",
+  "sources": {},
+  "layers": [
+    {
+      "id": "background",
+      "type": "background",
+      "paint": { "background-color": "#04060f" }
+    }
+  ]
+}
