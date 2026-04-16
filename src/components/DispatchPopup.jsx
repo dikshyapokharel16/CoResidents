@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { RESIDENT_TYPES } from '../data/residents'
 import { stressBadge } from '../theme'
@@ -11,13 +11,62 @@ import {
 } from '../utils/storage'
 import { icons } from './icons'
 
+// Voice personality per resident type
+const VOICE_CONFIG = {
+  fox:    { rate: 1.05, pitch: 0.88, volume: 1.0 },  // cautious, earthy, slightly low
+  bee:    { rate: 1.35, pitch: 1.55, volume: 0.9 },  // fast, high, urgent
+  bird:   { rate: 1.25, pitch: 1.45, volume: 0.95 }, // quick, light, airy
+  tree:   { rate: 0.78, pitch: 0.62, volume: 1.0 },  // very slow, very deep, ancient
+  boar:   { rate: 0.90, pitch: 0.72, volume: 1.0 },  // low, gruff, forceful
+  spree:  { rate: 0.83, pitch: 0.80, volume: 0.95 }, // slow, flowing, resonant
+  street: { rate: 0.95, pitch: 0.88, volume: 0.85 }, // flat, worn, tired
+}
+
 export default function DispatchPopup({ resident, onClose }) {
   const [phase, setPhase] = useState('dispatch') // 'dispatch' | 'aftermath' | 'ignored' | 'cityhealth'
   const [helperCount, setHelperCount] = useState(0)
   const [kiezHealth, setKiezHealth] = useState(0)
   const [fromIgnore, setFromIgnore] = useState(false)
+  const [speaking, setSpeaking] = useState(false)
+  const utterRef = useRef(null)
   const type = RESIDENT_TYPES[resident.type]
   const Icon = icons[resident.type]
+  const voice = VOICE_CONFIG[resident.type] ?? { rate: 1.0, pitch: 1.0, volume: 1.0 }
+
+  // Cancel speech whenever leaving dispatch phase or unmounting
+  useEffect(() => {
+    if (phase !== 'dispatch') {
+      window.speechSynthesis?.cancel()
+      setSpeaking(false)
+    }
+  }, [phase])
+
+  useEffect(() => {
+    return () => { window.speechSynthesis?.cancel() }
+  }, [])
+
+  const toggleVoice = () => {
+    const synth = window.speechSynthesis
+    if (!synth) return
+
+    if (speaking) {
+      synth.cancel()
+      setSpeaking(false)
+      return
+    }
+
+    synth.cancel()
+    const utter = new SpeechSynthesisUtterance(resident.dispatch)
+    utter.rate = voice.rate
+    utter.pitch = voice.pitch
+    utter.volume = voice.volume
+    utter.onstart = () => setSpeaking(true)
+    utter.onend = () => setSpeaking(false)
+    utter.onerror = () => setSpeaking(false)
+    utterRef.current = utter
+    synth.speak(utter)
+    setSpeaking(true)
+  }
 
   const handleDo = () => {
     setHelperCount(incrementHelperCount(resident.type))
@@ -88,8 +137,43 @@ export default function DispatchPopup({ resident, onClose }) {
             <div style={{ height: 1, background: 'rgba(0,245,255,0.08)', margin: '4px 0 16px' }} />
 
             {/* Dispatch — first-person narrative */}
-            <div style={s.dispatchLabel}>Dispatch from {resident.kiez}</div>
-            <p style={s.dispatch}>{resident.dispatch}</p>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 10 }}>
+              <div style={s.dispatchLabel}>Dispatch from {resident.kiez}</div>
+              <motion.button
+                style={{
+                  ...s.micBtn,
+                  background: speaking ? `${type.color}28` : `${type.color}0d`,
+                  border: `1.5px solid ${speaking ? `${type.color}bb` : `${type.color}55`}`,
+                  color: speaking ? type.color : `${type.color}99`,
+                }}
+                onClick={toggleVoice}
+                whileHover={{ scale: 1.08 }}
+                whileTap={{ scale: 0.94 }}
+                title={speaking ? 'Stop voice' : 'Hear this dispatch'}
+              >
+                {/* Pulsing ring when idle */}
+                {!speaking && (
+                  <motion.span
+                    style={{
+                      position: 'absolute', inset: -5,
+                      borderRadius: '50%',
+                      border: `1.5px solid ${type.color}66`,
+                      pointerEvents: 'none',
+                    }}
+                    animate={{ scale: [1, 1.55, 1], opacity: [0.6, 0, 0.6] }}
+                    transition={{ duration: 1.8, repeat: Infinity, ease: 'easeInOut' }}
+                  />
+                )}
+                {/* Mic icon */}
+                <svg width="13" height="16" viewBox="0 0 13 16" fill="none">
+                  <rect x="4" y="0" width="5" height="9" rx="2.5" fill="currentColor"/>
+                  <path d="M1 7.5C1 10.538 3.462 13 6.5 13C9.538 13 12 10.538 12 7.5" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round"/>
+                  <line x1="6.5" y1="13" x2="6.5" y2="15.5" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round"/>
+                  <line x1="4" y1="15.5" x2="9" y2="15.5" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round"/>
+                </svg>
+              </motion.button>
+            </div>
+            <p style={s.dispatch}>"{resident.dispatch}"</p>
 
             {/* Action section */}
             <div style={{ ...s.actionBox, borderColor: `${type.color}30` }}>
@@ -216,7 +300,14 @@ const s = {
   dispatchLabel: {
     fontFamily: 'Inter', fontSize: 9, fontWeight: 600,
     letterSpacing: '0.2em', textTransform: 'uppercase',
-    color: 'rgba(212,168,136,0.35)', marginBottom: 10,
+    color: 'rgba(212,168,136,0.35)', marginBottom: 0,
+  },
+  micBtn: {
+    position: 'relative',
+    width: 34, height: 34, borderRadius: '50%',
+    display: 'flex', alignItems: 'center', justifyContent: 'center',
+    cursor: 'pointer', flexShrink: 0,
+    transition: 'background 0.2s, border-color 0.2s, color 0.2s',
   },
   dispatch: {
     fontFamily: "'Playfair Display', serif",
