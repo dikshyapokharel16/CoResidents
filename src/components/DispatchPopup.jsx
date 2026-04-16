@@ -15,6 +15,7 @@ export default function DispatchPopup({ resident, onClose }) {
   const [phase, setPhase] = useState('dispatch') // 'dispatch' | 'aftermath' | 'ignored' | 'cityhealth'
   const [helperCount, setHelperCount] = useState(0)
   const [kiezHealth, setKiezHealth] = useState(0)
+  const [fromIgnore, setFromIgnore] = useState(false)
   const type = RESIDENT_TYPES[resident.type]
   const Icon = icons[resident.type]
 
@@ -38,7 +39,7 @@ export default function DispatchPopup({ resident, onClose }) {
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
       transition={{ duration: 0.35 }}
-      onClick={e => { if (e.target === e.currentTarget) onClose() }}
+      onClick={undefined}
     >
       <AnimatePresence mode="wait">
 
@@ -52,9 +53,6 @@ export default function DispatchPopup({ resident, onClose }) {
             exit={{ opacity: 0, y: -30, scale: 0.96 }}
             transition={{ type: 'spring', stiffness: 220, damping: 24 }}
           >
-            {/* Close button */}
-            <button style={s.closeBtn} onClick={onClose} aria-label="close">✕</button>
-
             {/* Neighbourhood badge */}
             <div style={s.kiezBadge}>
               <span style={s.kiezDot} />
@@ -140,7 +138,7 @@ export default function DispatchPopup({ resident, onClose }) {
             helperCount={helperCount}
             kiezHealth={kiezHealth}
             onClose={onClose}
-            onViewHealth={() => setPhase('cityhealth')}
+            onViewHealth={() => { setFromIgnore(false); setPhase('cityhealth') }}
           />
         )}
 
@@ -152,7 +150,7 @@ export default function DispatchPopup({ resident, onClose }) {
             type={type}
             Icon={Icon}
             onClose={onClose}
-            onViewHealth={() => setPhase('cityhealth')}
+            onViewHealth={() => { setFromIgnore(true); setPhase('cityhealth') }}
           />
         )}
 
@@ -161,6 +159,7 @@ export default function DispatchPopup({ resident, onClose }) {
           <CityHealthScreen
             key="cityhealth"
             onClose={onClose}
+            fromIgnore={fromIgnore}
           />
         )}
 
@@ -188,13 +187,6 @@ const s = {
     display: 'flex', flexDirection: 'column', gap: 0,
     position: 'relative',
     maxHeight: '90vh', overflowY: 'auto',
-  },
-  closeBtn: {
-    position: 'absolute', top: 16, right: 16,
-    background: 'none', border: 'none',
-    color: 'rgba(224,240,255,0.3)', fontSize: 14,
-    cursor: 'pointer', padding: '4px 6px', lineHeight: 1,
-    fontFamily: 'Inter',
   },
   kiezBadge: {
     display: 'inline-flex', alignItems: 'center', gap: 7,

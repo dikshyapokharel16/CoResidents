@@ -86,7 +86,7 @@ const TEXT_ROWS = [
 const CURSOR_SIZE = 120
 
 export default function LandingScreen({ onComplete }) {
-  const DESC = "We are not the only ones living here. This is a translation for those who have no words — the fox, the river, the tree, the street... Dispatches from the non-human city."
+  const DESC = "We are not the only ones living here. This is a translation for those who have no words — the fox, the river, the tree, the street..."
 
   const [ready, setReady] = useState(false)
   const [mouse, setMouse] = useState({ x: -300, y: -300 })
@@ -377,7 +377,7 @@ export default function LandingScreen({ onComplete }) {
           animate={ready ? { opacity: 1 } : {}}
           transition={staggerDelay(4)}
         >
-          DISPATCHES FROM THE NON-HUMANS
+          DISPATCHES INCOMING
         </motion.div>
 
         {/* Description box — typewriter inside rectangle */}

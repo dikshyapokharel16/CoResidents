@@ -19,7 +19,7 @@ const popColor = (status) => {
   return '#00ff88'
 }
 
-export default function CityHealthScreen({ onClose }) {
+export default function CityHealthScreen({ onClose, fromIgnore = false }) {
   const personalActions = getPersonalActions()
   const personalIgnores = getPersonalIgnores()
 
@@ -47,8 +47,6 @@ export default function CityHealthScreen({ onClose }) {
       exit={{ opacity: 0, y: -20, scale: 0.96 }}
       transition={{ type: 'spring', stiffness: 210, damping: 26 }}
     >
-      <button style={s.closeBtn} onClick={onClose} aria-label="close">x</button>
-
       <div style={s.titleRow}>
         <div style={s.titleLabel}>City Health</div>
         <div style={s.titleSub}>Berlin — Non-human residents</div>
@@ -142,12 +140,12 @@ export default function CityHealthScreen({ onClose }) {
       </div>
 
       <motion.button
-        style={s.backBtn}
-        whileHover={{ backgroundColor: 'rgba(0,245,255,0.08)', scale: 1.01 }}
+        style={s.actionBtn}
+        whileHover={{ opacity: 0.88, scale: 1.01 }}
         whileTap={{ scale: 0.97 }}
         onClick={onClose}
       >
-        Back to the map
+        {fromIgnore ? 'Take Action This Time' : 'Take More Action'}
       </motion.button>
     </motion.div>
   )
@@ -164,13 +162,6 @@ const s = {
     display: 'flex', flexDirection: 'column',
     position: 'relative',
     maxHeight: '92vh', overflowY: 'auto',
-  },
-  closeBtn: {
-    position: 'absolute', top: 16, right: 16,
-    background: 'none', border: 'none',
-    color: 'rgba(224,240,255,0.3)', fontSize: 14,
-    cursor: 'pointer', padding: '4px 6px', lineHeight: 1,
-    fontFamily: 'Inter',
   },
   titleRow: { marginBottom: 18 },
   titleLabel: {
@@ -241,14 +232,15 @@ const s = {
     fontFamily: 'Inter', fontSize: 10, fontWeight: 600,
     width: 28, textAlign: 'right', flexShrink: 0,
   },
-  backBtn: {
-    width: '100%', padding: '16px 0',
-    background: 'transparent',
-    border: '1.5px solid rgba(0,245,255,0.3)',
-    borderRadius: 10, cursor: 'pointer',
-    color: '#00f5ff',
-    fontFamily: 'Inter', fontSize: 13, fontWeight: 600,
-    letterSpacing: '0.06em',
-    transition: 'background 0.2s',
+  actionBtn: {
+    width: '100%', padding: '20px 0',
+    background: '#00f5ff',
+    border: 'none',
+    borderRadius: 12, cursor: 'pointer',
+    color: '#04060f',
+    fontFamily: 'Inter', fontSize: 15, fontWeight: 800,
+    letterSpacing: '0.12em', textTransform: 'uppercase',
+    boxShadow: '0 0 32px rgba(0,245,255,0.35)',
+    transition: 'opacity 0.2s',
   },
 }

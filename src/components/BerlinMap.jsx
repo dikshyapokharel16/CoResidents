@@ -927,29 +927,6 @@ export default function BerlinMap({ selectedKiez }) {
           )}
         </div>
 
-        {/* Confirmed kiez pill */}
-        <AnimatePresence>
-          {locationSet && (
-            <motion.div
-              style={{
-                display: 'inline-flex', alignItems: 'center', gap: 7,
-                background: 'rgba(212,104,42,0.08)',
-                border: '1px solid rgba(0,245,255,0.3)',
-                borderRadius: 20, padding: '5px 12px',
-                fontFamily: 'Inter', fontSize: 10.5,
-                color: 'rgba(212,104,42,0.9)',
-                letterSpacing: '0.05em', alignSelf: 'flex-start',
-                boxShadow: '0 0 14px rgba(0,245,255,0.12)',
-              }}
-              initial={{ opacity: 0, y: -6 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0 }}
-            >
-              <span style={{ width: 5, height: 5, borderRadius: '50%', background: '#00f5ff', boxShadow: '0 0 6px rgba(0,245,255,0.7)' }} />
-              {submittedKiez} · dispatch incoming
-            </motion.div>
-          )}
-        </AnimatePresence>
       </motion.div>
 
       {/* ── Click-to-place overlay ───────────────────────────── */}

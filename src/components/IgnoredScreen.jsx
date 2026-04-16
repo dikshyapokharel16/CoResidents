@@ -36,9 +36,6 @@ export default function IgnoredScreen({ resident, type, Icon, onClose, onViewHea
       exit={{ opacity: 0, y: -20, scale: 0.96 }}
       transition={{ type: 'spring', stiffness: 210, damping: 26 }}
     >
-      {/* Close */}
-      <button style={s.closeBtn} onClick={onClose} aria-label="close">✕</button>
-
       {/* Header */}
       <div style={s.header}>
         <div style={{
@@ -114,15 +111,25 @@ export default function IgnoredScreen({ resident, type, Icon, onClose, onViewHea
 
       </div>
 
-      {/* Button */}
-      <motion.button
-        style={s.btnHealth}
-        whileHover={{ backgroundColor: 'rgba(0,245,255,0.1)', scale: 1.01 }}
-        whileTap={{ scale: 0.97 }}
-        onClick={onViewHealth}
-      >
-        See city health
-      </motion.button>
+      {/* Buttons */}
+      <div style={{ display: 'flex', gap: 12 }}>
+        <motion.button
+          style={{ ...s.btnHealth, flex: 1, borderColor: 'rgba(224,240,255,0.15)', color: 'rgba(224,240,255,0.4)' }}
+          whileHover={{ backgroundColor: 'rgba(255,255,255,0.05)', scale: 1.01 }}
+          whileTap={{ scale: 0.97 }}
+          onClick={onClose}
+        >
+          Back to the city
+        </motion.button>
+        <motion.button
+          style={{ ...s.btnHealth, flex: 1 }}
+          whileHover={{ backgroundColor: 'rgba(0,245,255,0.1)', scale: 1.01 }}
+          whileTap={{ scale: 0.97 }}
+          onClick={onViewHealth}
+        >
+          See city health
+        </motion.button>
+      </div>
     </motion.div>
   )
 }
@@ -138,13 +145,6 @@ const s = {
     display: 'flex', flexDirection: 'column', gap: 0,
     position: 'relative',
     maxHeight: '92vh', overflowY: 'auto',
-  },
-  closeBtn: {
-    position: 'absolute', top: 16, right: 16,
-    background: 'none', border: 'none',
-    color: 'rgba(224,240,255,0.3)', fontSize: 14,
-    cursor: 'pointer', padding: '4px 6px', lineHeight: 1,
-    fontFamily: 'Inter',
   },
   header: {
     display: 'flex', alignItems: 'center',

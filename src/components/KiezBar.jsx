@@ -40,7 +40,7 @@ export default function KiezBar({ selectedKiez, onSelectKiez }) {
 
   return (
     <div style={s.bar}>
-      <div style={s.title}>Kiez</div>
+      <div style={s.title}>Select Your Kiez</div>
 
       <div style={s.searchWrap}>
         <svg width="10" height="10" viewBox="0 0 14 14" fill="none" style={{ flexShrink: 0, opacity: 0.4 }}>
@@ -99,7 +99,7 @@ const s = {
   bar: {
     position: 'absolute',
     top: 0, right: 0, bottom: 0,
-    width: 160,
+    width: 175,
     background: 'rgba(4,6,15,0.92)',
     borderLeft: '1px solid rgba(0,245,255,0.08)',
     backdropFilter: 'blur(16px)',
@@ -110,12 +110,14 @@ const s = {
   },
   title: {
     fontFamily: "'Inter', sans-serif",
-    fontSize: 8, fontWeight: 700,
-    letterSpacing: '0.32em', textTransform: 'uppercase',
-    color: 'rgba(0,245,255,0.4)',
-    padding: '20px 14px 12px',
-    borderBottom: '1px solid rgba(0,245,255,0.07)',
+    fontSize: 13, fontWeight: 900,
+    letterSpacing: '0.08em', textTransform: 'uppercase',
+    color: '#00f5ff',
+    textShadow: '0 0 18px rgba(0,245,255,0.7)',
+    padding: '20px 14px 14px',
+    borderBottom: '1px solid rgba(0,245,255,0.12)',
     flexShrink: 0,
+    lineHeight: 1.35,
   },
   searchWrap: {
     display: 'flex', alignItems: 'center', gap: 7,

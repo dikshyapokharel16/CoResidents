@@ -38,9 +38,6 @@ export default function AftermathScreen({ resident, type, Icon, helperCount, kie
       exit={{ opacity: 0, y: -20, scale: 0.96 }}
       transition={{ type: 'spring', stiffness: 210, damping: 26 }}
     >
-      {/* Close */}
-      <button style={s.closeBtn} onClick={onClose} aria-label="close">✕</button>
-
       {/* Header */}
       <div style={s.header}>
         <div style={{
@@ -165,13 +162,6 @@ const s = {
     display: 'flex', flexDirection: 'column', gap: 0,
     position: 'relative',
     maxHeight: '90vh', overflowY: 'auto',
-  },
-  closeBtn: {
-    position: 'absolute', top: 16, right: 16,
-    background: 'none', border: 'none',
-    color: 'rgba(224,240,255,0.3)', fontSize: 14,
-    cursor: 'pointer', padding: '4px 6px', lineHeight: 1,
-    fontFamily: 'Inter',
   },
   header: {
     display: 'flex', alignItems: 'center',
